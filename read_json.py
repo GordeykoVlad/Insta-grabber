@@ -2,25 +2,28 @@ import json
 import glob
 import collections
 
-files_followers = glob.glob("json/followers/*.json")
-files_following = glob.glob("json/following/*.json")
+files_users = glob.glob("json/users/*.json")
+# files_following = glob.glob("json/following/*.json")
 
 
 def parse_json(argument, jsons):
-    followers = {}
+    user_data = []
     for file in jsons:
         with open(file, 'r') as f:
             data = json.load(f)
             for user in data['data']['user'][f'{argument}']['edges']:
                 user_info = user['node']
-                followers[user_info['username']] = {
+                user_data.append({
                     'id': user_info['id'],
                     'username': user_info['username'],
+                    'full_name': user_info['full_name'],
+                    'is_private': user_info['is_private'],
+                    'is_verified': user_info['is_verified'],
                     'followed_by_viewer': user_info['followed_by_viewer'],
-                    'full_name': user_info['full_name']
-                }
+                })
+    users = {'users': user_data}
 
-    return followers
+    return users
 
 
 def unfollowers (list_1, list_2):
@@ -43,16 +46,11 @@ def sort_list(list,list_2):
         following_array.append(key)
     return followers_array, following_array
 
-followers = parse_json('edge_followed_by', files_followers)
-following = parse_json('edge_follow', files_following)
 
-followers_array, following_array = sort_list(followers, following)
-unfollowers(followers_array, following_array)
-# sort_list(following)
+users = parse_json('edge_followed_by', files_users)
 
-# sorted_dict = collections.OrderedDict(sorted_x)
-# for k,v in followers.items():
-#     print(f'{k}, {v["full_name"]}')
 
-# with open('followers.json', 'w') as outfile:
-#     json.dump(followers, outfile)
+with open(f'json/users/users.json', 'w') as f:
+    json.dump(users, f)
+
+

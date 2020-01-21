@@ -1,3 +1,8 @@
 .idea/
 venv/
 json/
+followers.json
+__pycache__/
+csv/
+session_file
+config.py
